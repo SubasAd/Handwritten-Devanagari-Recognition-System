@@ -12,12 +12,12 @@ warnings.filterwarnings("ignore")
 class Recog:
     def Recognition(self, img):
         def prediction(img):
-            json_file = open('middle.json', 'r')
+            json_file = open('middle (1).json', 'r')
 
             loaded_model_json = json_file.read()
             json_file.close()
             loaded_model = model_from_json(loaded_model_json)
-            loaded_model.load_weights("middle.h5")
+            loaded_model.load_weights("middle (1).h5")
             loaded_model.save('middle.hdf5')
             loaded_model = load_model('middle.hdf5')
             roi = cv2.resize(img, (32, 32), interpolation=cv2.INTER_AREA)
