@@ -20,7 +20,12 @@ class Recog:
             loaded_model.load_weights("middle (1).h5")
             loaded_model.save('middle.hdf5')
             loaded_model = load_model('middle.hdf5')
-            roi = cv2.resize(img, (32, 32), interpolation=cv2.INTER_AREA)
+            roi = cv2.resize(img, (29, 29), interpolation=cv2.INTER_AREA)
+            imgxwithpadding  = np.zeros((32,32),np.uint8)
+            imgxwithpadding[1:30,1:30] = roi
+            roi = imgxwithpadding
+            plt.imshow(roi)
+            plt.show()
             roi = np.array(roi)
             roi.reshape(1, 1024)
             prediction = loaded_model.predict(roi.reshape(1, 1024))
@@ -45,6 +50,27 @@ class Recog:
         return classifier(img)
 
     def Segmentation(self, ximg):
+        keys2,keys,  ximg = self.keyDetection(ximg)
+        char = ""
+        segmentedimages = []
+        for key in range(0, len(keys) - 1):
+            imgx = ximg[0:ximg.shape[0], keys[key]-2:(keys2[key+1] + keys[key+1])//2+4]
+            sum = 0
+            for i in imgx:
+                for j in imgx:
+                    sum += j
+            if(len(sum) < 20):
+                continue
+            recognizedcharacter  = self.Recognition(imgx)
+            if recognizedcharacter == '८':
+                pass
+            else:
+                char += recognizedcharacter
+
+            segmentedimages.append(imgx)
+        return char
+
+    def keyDetection(self, ximg):
         ximg = cv2.bitwise_not(ximg)
         ximg = cv2.dilate(ximg, np.ones((3, 3), np.uint8))
         dict = {}
@@ -71,21 +97,16 @@ class Recog:
                 current_part = {current_key: greater_than_threshold[key]}
                 parts.append(current_part)
         keys.append(ximg.shape[1])
-        char = ""
-        segmentedimages = []
-        for key in range(0, len(keys) - 1):
-            imgx = ximg[0:ximg.shape[0], keys[key]:keys[key + 1]]
-            sum = 0
-            for i in imgx:
-                for j in imgx:
-                    sum += j
-            if(len(sum) < 20):
-                continue
-            recognizedcharacter  = self.Recognition(imgx)
-            if recognizedcharacter == '८':
-                pass
+        keys2 = []
+        for key in sorted(greater_than_threshold.keys(),reverse=True):
+            if key == current_key - 1:
+                current_key = key
+                current_part[key] = greater_than_threshold[key]
             else:
-                char += recognizedcharacter
+                current_key = key
+                keys2.append(key)
+                current_part = {current_key: greater_than_threshold[key]}
+                parts.append(current_part)
+        keys2.append(0)
 
-            segmentedimages.append(imgx)
-        return char
+        return  keys2[::-1],keys, ximg
