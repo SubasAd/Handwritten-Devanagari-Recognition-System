@@ -72,7 +72,7 @@ class line_segmentation:
         cv2.imwrite("img.png", img3)
 
 
-        ninth_word = words_list[5]
+
 
         for i in range(0, len(words_list)):
 

@@ -190,12 +190,18 @@ def downSegmentation(bordered):
     for rowPixel in pixelPositions:
         if pixelPositions[rowPixel] < 10:
             onlyDika.append(rowPixel)
+    print(onlyDika)
     for i in range(0,len(onlyDika)-1):
-        if onlyDika[i] - onlyDika[i+1] > 2:
-            discontinuities.append((onlyDika[i]+onlyDika[i+1])//2)
+        if (onlyDika[i] - onlyDika[i+1]) < -1:
+            discontinuities.append(onlyDika[i])
+            discontinuities.append(onlyDika[i+1])
     #Logic for irregularities
     print("Discontinuities" ,discontinuities)
-    if len(discontinuities) == 0:
+    if len(discontinuities) <= 2:
         return [bordered]
     else:
-        return [bordered[0:bordered.shape[0], 0:discontinuities[0]], bordered[discontinuities[0]:bordered.shape[1]]]
+        plt.imshow(bordered[0:bordered.shape[0]-1, 0:discontinuities[1]])
+        plt.show()
+        plt.imshow(bordered[0:bordered.shape[0]-1,(discontinuities[2]+discontinuities[1])//2:discontinuities[3]])
+        plt.show()
+        return [bordered[0:bordered.shape[0]-1, 0:discontinuities[1]+(discontinuities[2]+discontinuities[1])//3], bordered[0:bordered.shape[0]-1,(discontinuities[2]+discontinuities[1])//2:discontinuities[3]]]
