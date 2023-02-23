@@ -114,7 +114,7 @@ def getLetterfromWholemage(imgx):
     if up is None or down is None or sudden_increases == []:
         return ""
     down = cv2.dilate(down, np.zeros((5, 5), np.uint8))
-    downSegments = downSegmentation(down, 0.15)
+    downSegments = downSegmentation(down)
     char = Recognition.Recog()
     imgxchar = getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases, up)
     return imgxchar
@@ -122,7 +122,7 @@ def getLetterfromWholemage(imgx):
 
 def getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases, up):
     imgxchar = ""
-    if len(downSegments[0]) > 1:
+    if len(downSegments) > 1:
         mid1, mid2 = getMidCharactersWithMiddleModifiers(char, downSegments)
         if mid1 is 'ा':
             imgxchar = 'ि' + mid2
@@ -138,21 +138,21 @@ def getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases,
                 imgxchar = mid1 + 'ी'
             if modifier is 'ँ':
                 imgxchar = mid1 + 'ाँ'
-    if len(downSegments[0]) == 1:
+    if len(downSegments) == 1:
         modifier = ""
 
         if (isTopNonEmpty(matraPositions, sudden_increases)):
             modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")
-        mid1 = char.Recognition(downSegments[0][0], "middle (1).json", "middle (1).h5",
+        mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
                                 'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
         imgxchar = mid1 + modifier
     return imgxchar
 
 
 def getMidCharactersWithMiddleModifiers(char, downSegments):
-    mid1 = char.Recognition(downSegments[0][0], "middle (1).json", "middle (1).h5",
+    mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
                             'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
-    mid2 = char.Recognition(downSegments[0][1], "middle (1).json", "middle (1).h5",
+    mid2 = char.Recognition(downSegments[1], "middle (1).json", "middle (1).h5",
                             'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
     return mid1, mid2
 
@@ -182,44 +182,20 @@ def Binarization(ximg):
     return ximg
 
 
-def downSegmentation(bordered, scheck=0.05):
-    try:
-        shape = bordered.shape
-        check = int(scheck * shape[0])
-        image = bordered[:]
-        image = image[check:].T
-        shape = image.shape
-        bg = np.repeat(0, shape[1])
-        bg_keys = []
-        for row in range(1, shape[0]):
-            if (np.equal(bg, image[row]).all()):
-                bg_keys.append(row)
-
-        lenkeys = len(bg_keys) - 1
-        new_keys = [bg_keys[1], bg_keys[-1]]
-        # print(lenkeys)
-        for i in range(1, lenkeys):
-            if (bg_keys[i + 1] - bg_keys[i]) > check:
-                new_keys.append(bg_keys[i])
-                # print(i)
-
-        new_keys = sorted(new_keys)
-        # print(new_keys)
-        segmented_templates = []
-        first = 0
-        bounding_boxes = []
-        for key in new_keys[1:]:
-            segment = bordered.T[first:key]
-            if segment.shape[0] >= 10 and segment.shape[1] >= 10:
-                segmented_templates.append(segment.T)
-                bounding_boxes.append((first, key))
-            first = key
-
-        last_segment = bordered.T[new_keys[-1]:]
-        if last_segment.shape[0] >= 10 and last_segment.shape[1] >= 10:
-            segmented_templates.append(last_segment.T)
-            bounding_boxes.append((new_keys[-1], new_keys[-1] + last_segment.shape[0]))
-
-        return (segmented_templates, bounding_boxes)
-    except:
-        return [bordered, (0, bordered.shape[1])]
+def downSegmentation(bordered):
+    pixelPositions = {}
+    PixelValuesineachcolumn(bordered,pixelPositions)
+    onlyDika = []
+    discontinuities = []
+    for rowPixel in pixelPositions:
+        if pixelPositions[rowPixel] < 10:
+            onlyDika.append(rowPixel)
+    for i in range(0,len(onlyDika)-1):
+        if onlyDika[i] - onlyDika[i+1] > 2:
+            discontinuities.append((onlyDika[i]+onlyDika[i+1])//2)
+    #Logic for irregularities
+    print("Discontinuities" ,discontinuities)
+    if len(discontinuities) == 0:
+        return [bordered]
+    else:
+        return [bordered[0:bordered.shape[0], 0:discontinuities[0]], bordered[discontinuities[0]:bordered.shape[1]]]
