@@ -108,6 +108,8 @@ def SegmentationAndRecognition(ximg):
         imgx = ximg[0:ximg.shape[0], keys[key]:keys[key + 1]]
         imgxchar = getLetterfromWholemage(imgx)
         word += imgxchar
+
+
     return word
 def getLetterfromWholemage(imgx):
     up, down, matraPositions, sudden_increases = getDownmatrapositionsandShirorekhaposition(imgx)
