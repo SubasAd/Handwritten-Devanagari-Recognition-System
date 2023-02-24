@@ -126,27 +126,38 @@ def getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases,
     imgxchar = ""
     if len(downSegments) > 1:
         mid1, mid2 = getMidCharactersWithMiddleModifiers(char, downSegments)
-        if mid1 is 'ा':
-            imgxchar = 'ि' + mid2
-        elif mid2 is 'ा':
+        if mid1[1][0] > mid2[1][0]:
+            mid1 = 'ा'
+            mid2 = mid2[0]
+        elif mid2[1][0] > mid1[1][0]:
+            mid2 = 'ा'
+            mid1 = mid1[0]
+        else:
+            mid1 = 'ा'
+            mid2 = mid2[0]
+        if mid1 == 'ा':
+            imgxchar = mid2+'ि'
+        elif mid2 == 'ा':
             modifier = ""
             if (isTopNonEmpty(matraPositions, sudden_increases)):
-                modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")
-            if modifier is 'े':
+                modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")[0]
+            if modifier == 'े':
                 imgxchar = mid1 + 'ो'
-            if modifier is 'ै':
+            if modifier == 'ै':
                 imgxchar = mid1 + 'ौ'
-            if modifier is 'ि':
+            if modifier == 'ि':
                 imgxchar = mid1 + 'ी'
-            if modifier is 'ँ':
+            if modifier == 'ँ':
                 imgxchar = mid1 + 'ाँ'
+        return imgxchar
     if len(downSegments) == 1:
         modifier = ""
 
         if (isTopNonEmpty(matraPositions, sudden_increases)):
-            modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")
+            modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")[0]
         mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
-                                'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
+                                'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')[0]
+        print(mid1+modifier)
         imgxchar = mid1 + modifier
     return imgxchar
 
@@ -198,12 +209,8 @@ def downSegmentation(bordered):
             discontinuities.append(onlyDika[i])
             discontinuities.append(onlyDika[i+1])
     #Logic for irregularities
-    print("Discontinuities" ,discontinuities)
+
     if len(discontinuities) <= 2:
         return [bordered]
     else:
-        plt.imshow(bordered[0:bordered.shape[0]-1, 0:discontinuities[1]])
-        plt.show()
-        plt.imshow(bordered[0:bordered.shape[0]-1,(discontinuities[2]+discontinuities[1])//2:discontinuities[3]])
-        plt.show()
         return [bordered[0:bordered.shape[0]-1, 0:discontinuities[1]+(discontinuities[2]+discontinuities[1])//3], bordered[0:bordered.shape[0]-1,(discontinuities[2]+discontinuities[1])//2:discontinuities[3]]]

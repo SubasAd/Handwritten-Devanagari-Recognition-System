@@ -5,7 +5,7 @@ import copy_of_charactersegementation as rec
 import CharacterSegmentation as cs
 
 x = line_word_segmentation.line_segmentation()
-img = cv2.imread("5.png")
+img = cv2.imread("6.jpg")
 x.linewordSegementation(img)
 
 

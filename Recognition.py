@@ -26,7 +26,7 @@ class Recog:
             prediction = loaded_model.predict(roi.reshape(1, 1024))
             characters = characters.split(',')
             output = characters[np.argmax(prediction.reshape(len(characters)))]
-            return output
+            return output,prediction.reshape(len(characters))
 
         def classifier(segment,json,weights,characters):
             pred_lbl = ""
@@ -36,8 +36,8 @@ class Recog:
             segment = cv2.resize(segment, (32, 32))
             segment = cv2.erode(segment, (3, 3), 1)
             lbl = prediction(segment,json,weights,characters)
-            pred_lbl += lbl
-            return pred_lbl
+            pred_lbl += lbl[0]
+            return pred_lbl,lbl[1]
 
         return classifier(img,json_file,weights,characters)
 
