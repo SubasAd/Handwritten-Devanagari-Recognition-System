@@ -34,7 +34,7 @@ class line_segmentation:
 
         sorted_contours_lines = sorted(contours, key=lambda ctr: cv2.boundingRect(ctr)[1])
         for i in sorted_contours_lines:
-            print(cv2.boundingRect(i))
+            cv2.boundingRect(i)
 
         img2 = img.copy()
         lines = []
@@ -59,7 +59,7 @@ class line_segmentation:
             (cnt, heirarchy) = cv2.findContours(roi_line.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
             sorted_contour_words = sorted(cnt, key=lambda cntr: cv2.boundingRect(cntr)[0])
             for i in sorted_contour_words:
-                print(cv2.boundingRect(i)[0])
+                cv2.boundingRect(i)[0]
             for word in sorted_contour_words:
 
                 if cv2.contourArea(word) < 205:
@@ -78,5 +78,5 @@ class line_segmentation:
 
             roi_9 = img[words_list[i][1]:words_list[i][3], words_list[i][0]:words_list[i][2]]
             cv2.imwrite("i/" + str(i) + ".png", roi_9)
-            print("roi_9",roi_9)
+
 

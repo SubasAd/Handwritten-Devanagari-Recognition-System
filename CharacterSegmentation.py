@@ -126,6 +126,7 @@ def getLetterfromWholemage(imgx):
 def getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases, up):
     imgxchar = ""
     if len(downSegments) > 1:
+
         mid1, mid2 = getMidCharactersWithMiddleModifiers(char, downSegments)
         if mid1[1][0] > mid2[1][0]:
             mid1 = 'ा'
@@ -159,18 +160,27 @@ def getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases,
 
         if (isTopNonEmpty(matraPositions, sudden_increases)):
             modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")[0]
-        mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
+        if isAakar(downSegments[0]):
+            mid1 = 'ा'
+        else:
+            mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
                                 'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')[0]
+        if mid1 == '८':
+            mid1 = ''
         print(mid1+modifier)
         imgxchar = mid1 + modifier
     return imgxchar
 
 
 def getMidCharactersWithMiddleModifiers(char, downSegments):
-    mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
+    if isAakar(downSegments[0]):
+        mid1 = 'ा'
+        mid2 = char.Recognition(downSegments[1], "middle (1).json", "middle (1).h5",
+                                'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
+    else:
+        mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
                             'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
-    mid2 = char.Recognition(downSegments[1], "middle (1).json", "middle (1).h5",
-                            'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
+        mid2 = 'ा'
     return mid1, mid2
 
 
@@ -191,7 +201,6 @@ def Binarization(ximg):
     for i in range(0, len(ximg[0])):
         sum = 0
         for j in range(0, len(ximg)):
-            print(ximg[j][i])
             if (ximg[j][i] > 200):
                 ximg[j][i] = 255
             else:
@@ -207,7 +216,7 @@ def downSegmentation(bordered):
     for rowPixel in pixelPositions:
         if pixelPositions[rowPixel] < 10:
             onlyDika.append(rowPixel)
-    print(onlyDika)
+
     for i in range(0,len(onlyDika)-1):
         if (onlyDika[i] - onlyDika[i+1]) < -1:
             discontinuities.append(onlyDika[i])
@@ -218,3 +227,22 @@ def downSegmentation(bordered):
         return [bordered]
     else:
         return [bordered[0:bordered.shape[0]-1, 0:discontinuities[1]+(discontinuities[2]+discontinuities[1])//3], bordered[0:bordered.shape[0]-1,(discontinuities[2]+discontinuities[1])//2:discontinuities[3]]]
+
+
+def isAakar(image):  # black background, white text
+
+    image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    for i in range(0, len(image)):
+        for j in range(0, len(image[i])):
+            if image[i][j] > 150:
+                image[i][j] = 255
+            else:
+                image[i][j] = 0
+    image = image[0:image.shape[0], 0:int(image.shape[1] * 0.75)]
+    image = image / 255
+    sum = 0
+    for i in image:
+        for j in i:
+            sum += j
+    print(sum)
+    return sum > 350 and sum < 550
