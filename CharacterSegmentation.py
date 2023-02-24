@@ -113,12 +113,13 @@ def SegmentationAndRecognition(ximg):
     return word
 def getLetterfromWholemage(imgx):
     up, down, matraPositions, sudden_increases = getDownmatrapositionsandShirorekhaposition(imgx)
-    if up is None or down is None or sudden_increases == []:
-        return ""
-    down = cv2.dilate(down, np.zeros((5, 5), np.uint8))
-    downSegments = downSegmentation(down)
-    char = Recognition.Recog()
-    imgxchar = getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases, up)
+    if down is not None :
+        down = cv2.dilate(down, np.zeros((5, 5), np.uint8))
+        downSegments = downSegmentation(down)
+        char = Recognition.Recog()
+        imgxchar = getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases, up)
+    else:
+        imgxchar = ""
     return imgxchar
 
 
@@ -140,7 +141,10 @@ def getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases,
         elif mid2 == 'ा':
             modifier = ""
             if (isTopNonEmpty(matraPositions, sudden_increases)):
-                modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")[0]
+                if up is None :
+                    modifier = ""
+                else :
+                    modifier = char.Recognition(up, "up.json", "up.h5", "े , ै, ि, ँ")[0]
             if modifier == 'े':
                 imgxchar = mid1 + 'ो'
             if modifier == 'ै':

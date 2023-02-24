@@ -32,11 +32,15 @@ class Recog:
             pred_lbl = ""
             acc = []
             if segment == [] :
-                return ""
-            segment = cv2.resize(segment, (32, 32))
-            segment = cv2.erode(segment, (3, 3), 1)
-            lbl = prediction(segment,json,weights,characters)
-            pred_lbl += lbl[0]
+                return ["",0]
+            if segment is not None :
+                segment = cv2.resize(segment, (32, 32))
+                segment = cv2.erode(segment, (3, 3), 1)
+                lbl = prediction(segment,json,weights,characters)
+                pred_lbl += lbl[0]
+            else :
+                pred_lbl+= ""
+                lbl = ["", 0]
             return pred_lbl,lbl[1]
 
         return classifier(img,json_file,weights,characters)
