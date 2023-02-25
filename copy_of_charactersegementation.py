@@ -74,8 +74,12 @@ class Recog:
         return char
 
     def keyDetection(self, ximg):
+
         ximg = cv2.bitwise_not(ximg)
         ximg = cv2.dilate(ximg, np.ones((3, 3), np.uint8))
+        org  = ximg.copy()
+        kernel = np.ones((5, 5), np.float32) / 30
+        ximg = cv2.filter2D(ximg, -1, kernel)
         dict = {}
         for i in range(0, len(ximg[0])):
             sum = 0
@@ -85,7 +89,7 @@ class Recog:
             dict[i] = sum
         x = dict.values()
         x = list(set(x))
-        greater_than_threshold = {k: v for k, v in dict.items() if v > max(x[0:5])*1.35}
+        greater_than_threshold = {k: v for k, v in dict.items() if v >= max(x[0:5])*1.25}
         current_key = min(greater_than_threshold.keys())
         current_part = {current_key: greater_than_threshold[current_key]}
         parts = [current_part]
@@ -111,5 +115,5 @@ class Recog:
                 current_part = {current_key: greater_than_threshold[key]}
                 parts.append(current_part)
         keys2.append(0)
-
+        ximg = org
         return  keys2[::-1],keys, ximg

@@ -91,7 +91,7 @@ def getPositionofCharacterSegmentation(ximg):
     x = list(set(x))
     plt.imshow(ximg)
     plt.show()
-    greater_than_threshold = {k: v for k, v in characterpositions.items() if v > max(x[0:5])}
+    greater_than_threshold = {k: v for k, v in characterpositions.items() if v > max(x[0:5])*1.15}
     current_key = min(greater_than_threshold.keys())
     current_part = {current_key: greater_than_threshold[current_key]}
     return current_key, current_part, greater_than_threshold
