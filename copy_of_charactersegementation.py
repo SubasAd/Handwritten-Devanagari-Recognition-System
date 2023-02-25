@@ -49,12 +49,14 @@ class Recog:
 
         return classifier(img)
 
-    def Segmentation(self, ximg):
+    def Segmentation(self, ximg,counter):
         keys2,keys,  ximg = self.keyDetection(ximg)
+        copyForSegmentationShow = ximg.copy()
         char = ""
         segmentedimages = []
         for key in range(0, len(keys) - 1):
             imgx = ximg[0:ximg.shape[0], keys[key]-2:(keys2[key+1] + keys[key+1])//2+4]
+            cv2.rectangle(copyForSegmentationShow, (keys[key]-2,0), ((keys2[key+1] + keys[key+1])//2+4,ximg.shape[0]), (255, 0,0), 1)
             sum = 0
             for i in imgx:
                 for j in imgx:
@@ -68,6 +70,7 @@ class Recog:
                 char += recognizedcharacter
 
             segmentedimages.append(imgx)
+        cv2.imwrite("character segmentation/first"+ str(counter)+".png",copyForSegmentationShow)
         return char
 
     def keyDetection(self, ximg):
@@ -82,7 +85,7 @@ class Recog:
             dict[i] = sum
         x = dict.values()
         x = list(set(x))
-        greater_than_threshold = {k: v for k, v in dict.items() if v > max(x[0:5])}
+        greater_than_threshold = {k: v for k, v in dict.items() if v > max(x[0:5])*1.35}
         current_key = min(greater_than_threshold.keys())
         current_part = {current_key: greater_than_threshold[current_key]}
         parts = [current_part]

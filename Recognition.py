@@ -19,6 +19,7 @@ class Recog:
             imgxwithpadding  = np.zeros((32,32),np.uint8)
             imgxwithpadding[1:30,1:30] = roi
             roi = imgxwithpadding
+            roi = img
             plt.imshow(roi)
             plt.show()
             roi = np.array(roi)
@@ -35,7 +36,7 @@ class Recog:
                 return ["",0]
             if segment is not None :
                 segment = cv2.resize(segment, (32, 32))
-                segment = cv2.erode(segment, (3, 3), 1)
+                segment = cv2.bitwise_not(segment)
                 lbl = prediction(segment,json,weights,characters)
                 pred_lbl += lbl[0]
             else :

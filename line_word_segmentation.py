@@ -23,7 +23,6 @@ class line_segmentation:
             ret, thresh = cv2.threshold(img_gray, 80, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
             return thresh
-
         thresh_img = thresholding(img);
 
         # dilation

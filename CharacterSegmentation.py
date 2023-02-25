@@ -97,7 +97,8 @@ def getPositionofCharacterSegmentation(ximg):
     return current_key, current_part, greater_than_threshold
 
 
-def SegmentationAndRecognition(ximg):
+def SegmentationAndRecognition(ximg,i):
+
     originalcopy = ximg.copy()
     ximg = Preporocess(ximg)
     keys = getKeysforSegmentation(ximg)
@@ -105,10 +106,11 @@ def SegmentationAndRecognition(ximg):
     segmentedimages = []
     word = ""
     for key in range(0, len(keys) - 1):
-        imgx = ximg[0:ximg.shape[0], keys[key]:keys[key + 1]]
+        imgx = originalcopy[0:ximg.shape[0], keys[key]:keys[key + 1]]
+        cv2.rectangle(originalcopy,(0,keys[key]),(ximg.shape[0],keys[key+1]),(255,0,0),2)
         imgxchar = getLetterfromWholemage(imgx)
         word += imgxchar
-
+    cv2.imwrite("character segmentation/"+str(i)+".png",originalcopy)
 
     return word
 def getLetterfromWholemage(imgx):
@@ -128,15 +130,6 @@ def getLetterwithmodifiers(char, downSegments, matraPositions, sudden_increases,
     if len(downSegments) > 1:
 
         mid1, mid2 = getMidCharactersWithMiddleModifiers(char, downSegments)
-        if mid1[1][0] > mid2[1][0]:
-            mid1 = 'ा'
-            mid2 = mid2[0]
-        elif mid2[1][0] > mid1[1][0]:
-            mid2 = 'ा'
-            mid1 = mid1[0]
-        else:
-            mid1 = 'ा'
-            mid2 = mid2[0]
         if mid1 == 'ा':
             imgxchar = mid2+'ि'
         elif mid2 == 'ा':
@@ -176,10 +169,10 @@ def getMidCharactersWithMiddleModifiers(char, downSegments):
     if isAakar(downSegments[0]):
         mid1 = 'ा'
         mid2 = char.Recognition(downSegments[1], "middle (1).json", "middle (1).h5",
-                                'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
+                                'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')[0]
     else:
         mid1 = char.Recognition(downSegments[0], "middle (1).json", "middle (1).h5",
-                            'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')
+                            'ा,क,ख,ग,घ,ङ,च,छ,ज,झ,ञ,ट,ठ,ड,ढ,ण,त,थ,द,ध,न,प,फ,ब,भ,म,य,र,ल,व,श,ष,स,ह,क्ष,त्र,ज्ञ,०,१,२,३,४,५,६,७,८,९')[0]
         mid2 = 'ा'
     return mid1, mid2
 
@@ -192,6 +185,8 @@ def getKeysforSegmentation(ximg):
 
 def Preporocess(ximg):
     ximg = Binarization(ximg)
+    plt.imshow(ximg)
+    plt.show()
     ximg = cv2.bitwise_not(ximg)
     ximg = cv2.dilate(ximg, np.ones((3, 3), np.uint8))
     return ximg
