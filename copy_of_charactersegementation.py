@@ -50,7 +50,7 @@ class Recog:
         return classifier(img)
 
     def Segmentation(self, ximg,counter):
-        keys2,keys,  ximg = self.keyDetection(ximg)
+        keys2,keys,  ximg = self.getVerticalProjectionProfile(ximg)
         copyForSegmentationShow = ximg.copy()
         char = ""
         segmentedimages = []
@@ -73,7 +73,7 @@ class Recog:
         cv2.imwrite("character segmentation/first"+ str(counter)+".png",copyForSegmentationShow)
         return char
 
-    def keyDetection(self, ximg):
+    def getVerticalProjectionProfile(self, ximg):
 
         ximg = cv2.bitwise_not(ximg)
         ximg = cv2.dilate(ximg, np.ones((3, 3), np.uint8))
