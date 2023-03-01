@@ -74,7 +74,7 @@ class Recog:
         return char
 
     def getVerticalProjectionProfile(self, ximg):
-
+        ###################
         ximg = cv2.bitwise_not(ximg)
         ximg = cv2.dilate(ximg, np.ones((3, 3), np.uint8))
         org  = ximg.copy()
