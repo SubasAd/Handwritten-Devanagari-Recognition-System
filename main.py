@@ -2,11 +2,11 @@ import line_word_segmentation
 import os
 import cv2
 import copy_of_charactersegementation as rec
-import CharacterSegmentation as cs
+
 import matplotlib.pyplot as plt
 import numpy as np
 x = line_word_segmentation.line_segmentation()
-img = cv2.imread("51.jpg")
+img = cv2.imread("6.jpg")
 x.linewordSegementation(img)
 images = os.listdir("i/")
 strings  = [[] for i in images]
@@ -21,7 +21,7 @@ for i in range(0,len(images)):
     plt.imshow(img)
     plt.show()
     #char2 = cs.SegmentationAndRecognition(img,i)
-    os.remove("i/"+str(i)+".png")
+    # os.remove("i/"+str(i)+".png")
     strings[i].append(char)
     #string2[i].append(char2)
 print(strings)

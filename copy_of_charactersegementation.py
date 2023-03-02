@@ -50,13 +50,24 @@ class Recog:
     def Segmentation(self, ximg, counter):
         segmentingPosition = self.getVerticalProjectionProfile(ximg)
 
+
+
         ximg = cv2.bitwise_not(ximg)
+
         copyForSegmentationShow = ximg.copy()
+
+        for i in range(0, len(ximg)):
+            for j in range(0, len(ximg[1])):
+                if ximg[i][j] > 50 :
+                    ximg[i][j] = 255
+                else:
+                    ximg[i][j] = 0
         char = ""
         segmentedimages = []
-        for pos in range(0, len(segmentingPosition)-1):
-            imgx = ximg[0:ximg.shape[0], segmentingPosition[pos] :segmentingPosition[pos + 1] ]
-            cv2.rectangle(copyForSegmentationShow, (segmentingPosition[pos], 0),(segmentingPosition[pos + 1], ximg.shape[0]), (255, 0, 0), 1)
+        for pos in range(0, len(segmentingPosition) - 1):
+            imgx = ximg[0:ximg.shape[0], segmentingPosition[pos]:segmentingPosition[pos + 1]]
+            cv2.rectangle(copyForSegmentationShow, (segmentingPosition[pos], 0),
+                          (segmentingPosition[pos + 1], ximg.shape[0]), (255, 0, 0), 1)
             sum = 0
             for i in imgx:
                 for j in imgx:
@@ -83,7 +94,6 @@ class Recog:
         segmentingPosition = self.getSegmentationPosition(ximg)
         return segmentingPosition
 
-
     def getSegmentationPosition(self, ximg):
         std, average = self.getStdandAverageofVericallines(ximg)
         sum = self.getSumofVerticalLines(ximg)
@@ -102,7 +112,6 @@ class Recog:
         segmentingPosition.append(ximg.shape[1])
         print(segmentingPosition)
         return segmentingPosition
-
 
     def getSumofVerticalLines(self, ximg):
         dict = {}
