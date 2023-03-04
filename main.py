@@ -6,7 +6,7 @@ import copy_of_charactersegementation as rec
 import matplotlib.pyplot as plt
 import numpy as np
 x = line_word_segmentation.line_segmentation()
-img = cv2.imread("6.jpg")
+img = cv2.imread("51.jpg")
 x.linewordSegementation(img)
 images = os.listdir("i/")
 strings  = [[] for i in images]
